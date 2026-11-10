@@ -2,6 +2,11 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/home/adrian_sru/URV/SOB/SOB_prac1/PLANTILLA_PRACTICA1/Homework1/src/java/model/entities/Topic.java</file>
+            <file>file:/home/adrian_sru/URV/SOB/SOB_prac1/PLANTILLA_PRACTICA1/Homework1/src/conf/persistence.xml</file>
+            <file>file:/home/adrian_sru/URV/SOB/SOB_prac1/PLANTILLA_PRACTICA1/Homework1/src/java/service/RESTapp.java</file>
+            <file>file:/home/adrian_sru/URV/SOB/SOB_prac1/PLANTILLA_PRACTICA1/Homework1/src/java/model/entities/Comment.java</file>
+        </group>
     </open-files>
 </project-private>
