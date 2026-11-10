@@ -3,21 +3,24 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model.entities;
+import java.time.LocalDate;
+import java.io.Serializable;
 
 /**
  *
  * @author adrian_sru
  */
-public class Tool {
-    @Id
+public class Tool implements Serializable{
+    
     private long id;
     private String nom;
     private String descripcio;
     private String llenguatge;  // canviar a enum?
     private String codi;        // ?
-    private String autor;
+    private Customer autor;
     private String versio;
-    private String dataCreacio; // YYYY-MM-DD
+    private LocalDate dataCreacio;
+    private Boolean privat;
     
     public long getId() {
         return this.id;
@@ -59,11 +62,11 @@ public class Tool {
         this.codi = codi;
     }   
     
-    public String getAutor() {
+    public Customer getAutor() {
         return this.autor;
     }
     
-    public void setAutor(String autor) {
+    public void setAutor(Customer autor) {
         this.autor = autor;
     }
     
@@ -75,11 +78,19 @@ public class Tool {
         this.versio = versio;
     }
     
-    public String getDataCreacio() {
+    public LocalDate getDataCreacio() {
         return this.dataCreacio;
     }
     
-    public void setDataCreacio(String dataCreacio) {
+    public void setDataCreacio(LocalDate dataCreacio) {
         this.dataCreacio = dataCreacio;
+    }
+    
+    public Boolean isPrivat(){
+        return this.privat;
+    }
+    
+    public void setPrivat(Boolean privat){
+        this.privat = privat;
     }
 }
