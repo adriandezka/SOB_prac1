@@ -14,14 +14,34 @@ import java.util.Set;
  *
  * @author adrian_sru
  */
+@Entity
 public class Prompt implements Serializable {
-    private long id;
+    private static final long serialVersionUID = 1L;
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
     private String titol;
+    
     private String descripcio;
+    
+    @Lob
+    @Column(nullable = false)
     private String plantilla;
+    
+    @ManyToOne
     private Customer autor;
-    private Set<String> etiquetes = new HashSet<>();   // @elementCollection?
-    private LocalDate dataCreacio; // YYYY-MM-DD
+    
+    // Format: ",ia,python," (coma al principi i al final)
+    @Column(length = 1000)
+    private String etiquetes;
+    
+    @Column(nullable = false)
+    private LocalDate dataCreacio;
+    
+    @Column(nullable = false)
     private boolean privat;
     
     @ManyToMany(fetch = FetchType.EAGER)
@@ -67,11 +87,11 @@ public class Prompt implements Serializable {
         this.autor = autor;
     }
 
-    public Set<String> getEtiquetes() {
+    public String getEtiquetes() {
         return etiquetes;
     }
 
-    public void setEtiquetes(Set<String> etiquetes) {
+    public void setEtiquetes(String etiquetes) {
         this.etiquetes = etiquetes;
     }
 

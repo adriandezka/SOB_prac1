@@ -5,17 +5,28 @@
 package model.entities;
 
 import jakarta.json.bind.annotation.JsonbTransient;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 /**
  *
  * @author adrian_sru
  */
+@Entity
 public class Customer implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     private String nom;
+    
+    @Column(name = "username", nullable = false, unique = true)
     private String user;
+    
     @JsonbTransient
+    @Column(name = "password", nullable = false)
     private String pass;
 
     public Long getId() {

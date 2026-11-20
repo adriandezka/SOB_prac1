@@ -3,24 +3,45 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model.entities;
-import java.time.LocalDate;
+
+import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  *
  * @author adrian_sru
  */
-public class Tool implements Serializable{
+@Entity
+public class Tool implements Serializable {
+    private static final long serialVersionUID = 1L;
     
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
     private String nom;
+    
     private String descripcio;
-    private String llenguatge;  // canviar a enum?
-    private String codi;        // ?
+    
+    @Column(nullable = false)
+    private String llenguatge;
+    
+    @Lob
+    @Column(nullable = false)
+    private String codi;
+    
+    @ManyToOne
     private Customer autor;
+    
     private String versio;
+    
+    @Column(nullable = false)
     private LocalDate dataCreacio;
-    private Boolean privat;
+    
+    @Column(nullable = false)
+    private boolean privat;
     
     public long getId() {
         return this.id;
@@ -30,7 +51,7 @@ public class Tool implements Serializable{
         this.id = id;
     }
     
-    public String nom() {
+    public String getNom() {
         return this.nom;
     }
     
@@ -86,7 +107,7 @@ public class Tool implements Serializable{
         this.dataCreacio = dataCreacio;
     }
     
-    public Boolean isPrivat(){
+    public Boolean getPrivat(){
         return this.privat;
     }
     
