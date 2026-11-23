@@ -18,7 +18,7 @@ import jakarta.ws.rs.ext.Provider;
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.container.ResourceInfo;
-
+import model.entities.Customer;
 
 /**
  * @author Marc Sanchez
@@ -43,7 +43,6 @@ public class RESTRequestFilter implements ContainerRequestFilter {
             Secured secured = method.getAnnotation(Secured.class);
             if(secured != null)
             {
-                
                 List<String> headers = requestCtx.getHeaders()
                         .get(HttpHeaders.AUTHORIZATION);
                 
@@ -66,14 +65,17 @@ public class RESTRequestFilter implements ContainerRequestFilter {
                     }
                     
                     try {
-                        TypedQuery<Credentials> query = em.createNamedQuery("Credentials.findUser", Credentials.class);
-                        Credentials c = query.setParameter("username", username)
+                        TypedQuery<Customer> query = em.createNamedQuery("Customer.findByUser", Customer.class);
+                        Customer c = query.setParameter("user", username)
                             .getSingleResult();
-                        if(!c.getPassword().equals(password)) {
+                        if(!c.getPass().equals(password)) {
                             requestCtx.abortWith(
                                 Response.status(Response.Status.FORBIDDEN).build()
                             );
+                            return;
                         }
+                        // Store authenticated customer username in request context
+                        requestCtx.setProperty("auth_user", username);
                     } catch(@SuppressWarnings("unused") NoResultException e) {
                         requestCtx.abortWith(
                             Response.status(Response.Status.UNAUTHORIZED).build()

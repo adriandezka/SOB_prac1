@@ -12,9 +12,12 @@ import java.util.Set;
 
 /**
  *
- * @author adrian_sru
+ * @author Lucas Sierra, Adrián Rusu
  */
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "Prompt.findAll", query = "SELECT p FROM Prompt p ORDER BY p.titol ASC")
+})
 public class Prompt implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -34,9 +37,11 @@ public class Prompt implements Serializable {
     @ManyToOne
     private Customer autor;
     
-    // Format: ",ia,python," (coma al principi i al final)
-    @Column(length = 1000)
-    private String etiquetes;
+    //Es crea tabla PROMPT_ETIQUETES(PROMPT_ID, ETIQUETA)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "PROMPT_ETIQUETES", joinColumns = @JoinColumn(name = "PROMPT_ID"))
+    @Column(name = "ETIQUETA")
+    private Set<String> etiquetes = new HashSet<>();
     
     @Column(nullable = false)
     private LocalDate dataCreacio;
@@ -46,12 +51,14 @@ public class Prompt implements Serializable {
     
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Tool> tools = new HashSet<>();
+    
+    public Prompt(){}
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -87,11 +94,11 @@ public class Prompt implements Serializable {
         this.autor = autor;
     }
 
-    public String getEtiquetes() {
+    public Set<String> getEtiquetes() {
         return etiquetes;
     }
 
-    public void setEtiquetes(String etiquetes) {
+    public void setEtiquetes(Set<String> etiquetes) {
         this.etiquetes = etiquetes;
     }
 
@@ -118,7 +125,21 @@ public class Prompt implements Serializable {
     public void setTools(Set<Tool> tools) {
         this.tools = tools;
     }
-    
-    
-    
+
+    @Override
+    public int hashCode() {
+        return (id != null ? id.hashCode() : 0);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof Prompt)) {
+            return false;
+        }
+        Prompt other = (Prompt) object;
+        return this.id != null && this.id.equals(other.id);
+    }
 }

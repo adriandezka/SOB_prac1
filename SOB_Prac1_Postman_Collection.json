@@ -1,0 +1,917 @@
+{
+	"info": {
+		"_postman_id": "sob-p1-tests-collection-id",
+		"name": "SOB - Pràctica 1 (RESTful API Tests)",
+		"description": "Suite completa de proves automatitzades per a la Pràctica 1 de Sistemes Oberts (URV). Cobreix funcionalitats obligatòries i ampliacions opcionals (codis d'estat 200, 201, 400, 401, 404, HATEOAS, filtres a BD i visibilitat pública/privada).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080/Homework1/rest/api/v1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Customers (Usuaris)",
+			"item": [
+				{
+					"name": "GET /customer (Llistar usuaris sense contrasenya)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Retorna un array JSON d'usuaris\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.be.an('array');",
+									"    pm.expect(data.length).to.be.at.least(1);",
+									"});",
+									"pm.test(\"Seguretat: cap usuari exposa la contrasenya (pass)\", function () {",
+									"    var data = pm.response.json();",
+									"    data.forEach(function(u) {",
+									"        pm.expect(u).to.not.have.property('pass');",
+									"        pm.expect(u).to.not.have.property('password');",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/customer",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer"
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /customer/1 (Detall d'usuari amb enllaços HATEOAS)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Retorna dades de l'usuari amb enllaços HATEOAS\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.have.property('id');",
+									"    pm.expect(data).to.have.property('user');",
+									"    pm.expect(data).to.have.property('_links');",
+									"});",
+									"pm.test(\"Seguretat: no exposa la contrasenya\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.not.have.property('pass');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/customer/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /customer/9999 (Usuari inexistent -> 404 Not Found)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 404 Not Found\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/customer/9999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"9999"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Tools (Eines)",
+			"item": [
+				{
+					"name": "GET /tool (Llistar eines ordenades pel nom)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Visibilitat privada: eines privades no mostren codi a anònims\", function () {",
+									"    var data = pm.response.json();",
+									"    data.forEach(function(tool) {",
+									"        if (tool.privat === true) {",
+									"            pm.expect(tool).to.not.have.property('codi');",
+									"            pm.expect(tool).to.not.have.property('descripcio');",
+									"        }",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tool",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tool"
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /tool?language=Python (Filtratge per llenguatge a la BD)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Totes les eines retornades són en Python\", function () {",
+									"    var data = pm.response.json();",
+									"    data.forEach(function(tool) {",
+									"        pm.expect(tool.llenguatge.toLowerCase()).to.eql('python');",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tool?language=Python",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tool"
+							],
+							"query": [
+								{
+									"key": "language",
+									"value": "Python"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /tool/1 (Eina pública -> 200 OK completa)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Retorna dades completes de l'eina\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.have.property('codi');",
+									"    pm.expect(data).to.have.property('nom');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tool/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tool",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /tool/2 (Eina privada sense login -> 401 Unauthorized)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 401 Unauthorized\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tool/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tool",
+								"2"
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /tool/2 amb Basic Auth (Eina privada amb login -> 200 OK)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Retorna dades completes per a usuari autenticat\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data.privat).to.eql(true);",
+									"    pm.expect(data).to.have.property('codi');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "sob",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "sob",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tool/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tool",
+								"2"
+							]
+						}
+					}
+				},
+				{
+					"name": "POST /tool sense Auth -> 401 Unauthorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 401 Unauthorized\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nom\": \"Eina no autoritzada\",\n    \"codi\": \"print('test')\",\n    \"autor\": {\"id\": 1}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/tool",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tool"
+							]
+						}
+					}
+				},
+				{
+					"name": "POST /tool amb Basic Auth (Crear eina -> 201 Created)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test(\"Retorna l'identificador de la nova eina\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.have.property('id');",
+									"});",
+									"pm.test(\"Conté la capçalera Location\", function () {",
+									"    pm.expect(pm.response.headers.has('Location')).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "sob",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "sob",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nom\": \"Traductor Markdown\",\n    \"descripcio\": \"Converteix text a Markdown net\",\n    \"llenguatge\": \"Python\",\n    \"codi\": \"def to_md(text): return f'# {text}'\",\n    \"versio\": \"1.0\",\n    \"privat\": false,\n    \"autor\": {\n        \"id\": 1\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/tool",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tool"
+							]
+						}
+					}
+				},
+				{
+					"name": "POST /tool amb nom buit (Validació -> 400 Bad Request)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 400 Bad Request\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "sob",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "sob",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nom\": \"\",\n    \"codi\": \"print('hola')\",\n    \"autor\": {\"id\": 1}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/tool",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tool"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Prompts",
+			"item": [
+				{
+					"name": "GET /prompt (Llistar prompts ordenats per títol)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Retorna array de prompts\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.be.an('array');",
+									"    pm.expect(data.length).to.be.at.least(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/prompt",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"prompt"
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /prompt?tag=ia (Filtratge per etiqueta a la BD)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Els prompts contenen l'etiqueta 'ia'\", function () {",
+									"    var data = pm.response.json();",
+									"    data.forEach(function(prompt) {",
+									"        if (prompt.etiquetes) {",
+									"            pm.expect(prompt.etiquetes).to.include('ia');",
+									"        }",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/prompt?tag=ia",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"prompt"
+							],
+							"query": [
+								{
+									"key": "tag",
+									"value": "ia"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /prompt/1 (Prompt públic -> 200 OK completa)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Retorna dades completes i plantilla\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.have.property('plantilla');",
+									"    pm.expect(data).to.have.property('titol');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/prompt/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"prompt",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /prompt/2 (Prompt privat sense auth -> 401 Unauthorized)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 401 Unauthorized\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/prompt/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"prompt",
+								"2"
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /prompt/2 amb Basic Auth (Prompt privat autenticat -> 200 OK)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Retorna plantilla de prompt privat\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data.privat).to.eql(true);",
+									"    pm.expect(data).to.have.property('plantilla');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "sob",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "sob",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/prompt/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"prompt",
+								"2"
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /prompt/1/tools (Eines associades al Prompt 1)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Retorna la llista d'eines associades\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.be.an('array');",
+									"    pm.expect(data.length).to.be.at.least(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/prompt/1/tools",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"prompt",
+								"1",
+								"tools"
+							]
+						}
+					}
+				},
+				{
+					"name": "POST /prompt amb Basic Auth (Crear nou prompt -> 201 Created)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test(\"Retorna identificador del nou prompt\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.have.property('id');",
+									"});",
+									"pm.test(\"Capçalera Location present\", function () {",
+									"    pm.expect(pm.response.headers.has('Location')).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "sob",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "sob",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"titol\": \"Corrector d'Estil de Codi\",\n    \"descripcio\": \"Revisa codi Python seguint PEP8\",\n    \"plantilla\": \"Revisa el següent codi i corregeix l'estil:\\n{codi}\",\n    \"privat\": false,\n    \"etiquetes\": [\"python\", \"pep8\", \"qualitat\"],\n    \"autor\": {\n        \"id\": 1\n    },\n    \"tools\": [\n        {\"id\": 1}\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/prompt",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"prompt"
+							]
+						}
+					}
+				},
+				{
+					"name": "PUT /prompt/1/tools amb Basic Auth (Actualitzar eines associades)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estat HTTP és 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Retorna les eines actualitzades\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "sob",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "sob",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[1, 3]"
+						},
+						"url": {
+							"raw": "{{base_url}}/prompt/1/tools",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"prompt",
+								"1",
+								"tools"
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}

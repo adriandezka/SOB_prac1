@@ -10,9 +10,12 @@ import java.time.LocalDate;
 
 /**
  *
- * @author adrian_sru
+ * @author Lucas Sierra, Adrián Rusu
  */
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "Tool.findAll", query = "SELECT t FROM Tool t ORDER BY t.nom ASC")
+})
 public class Tool implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -43,11 +46,13 @@ public class Tool implements Serializable {
     @Column(nullable = false)
     private boolean privat;
     
-    public long getId() {
+    public Tool() {}
+    
+    public Long getId() {
         return this.id;
     }
     
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     
@@ -107,11 +112,28 @@ public class Tool implements Serializable {
         this.dataCreacio = dataCreacio;
     }
     
-    public Boolean getPrivat(){
+    public boolean isPrivat(){
         return this.privat;
     }
     
-    public void setPrivat(Boolean privat){
+    public void setPrivat(boolean privat){
         this.privat = privat;
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null ? id.hashCode() : 0);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof Tool)) {
+            return false;
+        }
+        Tool other = (Tool) object;
+        return this.id != null && this.id.equals(other.id);
     }
 }

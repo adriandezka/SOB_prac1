@@ -10,9 +10,14 @@ import java.io.Serializable;
 
 /**
  *
- * @author adrian_sru
+ * @authors Lucas Sierra, Adrian Rusu
  */
 @Entity
+@Table(name = "CUSTOMER")
+@NamedQueries({
+    @NamedQuery(name = "Customer.findAll", query = "SELECT c FROM Customer c"),
+    @NamedQuery(name = "Customer.findByUser", query = "SELECT c FROM Customer c WHERE LOWER(c.user) = LOWER(:user)")
+})
 public class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -20,6 +25,7 @@ public class Customer implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(name = "nombre", nullable = false)
     private String nom;
     
     @Column(name = "username", nullable = false, unique = true)
@@ -28,6 +34,8 @@ public class Customer implements Serializable {
     @JsonbTransient
     @Column(name = "password", nullable = false)
     private String pass;
+    
+    public Customer(){}
 
     public Long getId() {
         return id;
@@ -60,7 +68,21 @@ public class Customer implements Serializable {
     public void setPass(String pass) {
         this.pass = pass;
     }
-    
-    
-    
+
+    @Override
+    public int hashCode() {
+        return (id != null ? id.hashCode() : 0);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof Customer)) {
+            return false;
+        }
+        Customer other = (Customer) object;
+        return this.id != null && this.id.equals(other.id);
+    }
 }
