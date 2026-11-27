@@ -7,7 +7,7 @@
 <h2>Contenido Actual de la Base de Datos</h2>
 <%
     Class.forName("org.apache.derby.jdbc.ClientDriver");
-    Connection con = DriverManager.getConnection("jdbc:derby://localhost:1527/homework1", "root", "root");
+    Connection con = DriverManager.getConnection("jdbc:derby://localhost:1527/sob_grup_06", "root", "root");
     Statement stmt = con.createStatement();
 
     out.println("<h3>1. Tabla CUSTOMER:</h3><ul>");

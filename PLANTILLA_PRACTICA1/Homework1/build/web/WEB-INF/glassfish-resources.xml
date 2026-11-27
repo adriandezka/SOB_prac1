@@ -9,6 +9,7 @@
     <property name="serverName" value="localhost"/>
     <property name="PortNumber" value="1527"/>
     <property name="DatabaseName" value="sob_grup_06"/>
+    <property name="connectionAttributes" value=";create=true"/>
     <property name="User" value="root"/>
     <property name="Password" value="root"/>
   </jdbc-connection-pool>
